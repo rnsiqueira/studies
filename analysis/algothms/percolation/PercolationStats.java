@@ -20,8 +20,8 @@ public class PercolationStats {
         for (int trial = 0; trial < trials; trial++) {
             Percolation percolation = new Percolation(gridSize);
             while (!percolation.percolates()) {
-                int row = StdRandom.uniform(1, gridSize + 1);
-                int col = StdRandom.uniform(1, gridSize + 1);
+                int row = StdRandom.uniformInt(1, gridSize + 1);
+                int col = StdRandom.uniformInt(1, gridSize + 1);
                 percolation.open(row, col);
             }
             int openSites = percolation.numberOfOpenSites();
