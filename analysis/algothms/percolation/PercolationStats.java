@@ -1,7 +1,3 @@
-
-
-
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
@@ -14,33 +10,33 @@ public class PercolationStats {
     private final double[] results;
 
     public PercolationStats(int n, int trials) {
-        if (n < 0 || trials < 0) throw new IllegalArgumentException("n and trials not be less than 0");
+        if (n <= 0 || trials <= 0) {
+            throw new IllegalArgumentException("N and T must be <= 0");
+        }
+        int gridSize = n;
         this.trials = trials;
         this.results = new double[trials];
-        Percolation percolation = new Percolation(n);
+
         for (int trial = 0; trial < trials; trial++) {
-            int row = StdRandom.uniformInt(1, n + 1);
-            int col = StdRandom.uniformInt(1, n + 1);
-            do {
+            Percolation percolation = new Percolation(gridSize);
+            while (!percolation.percolates()) {
+                int row = StdRandom.uniform(1, gridSize + 1);
+                int col = StdRandom.uniform(1, gridSize + 1);
                 percolation.open(row, col);
-                while (percolation.isOpen(row, col)) {
-                    row = StdRandom.uniformInt(1, n + 1);
-                    col = StdRandom.uniformInt(1, n + 1);
-                }
-            } while (!percolation.percolates());
-            results[trial] = (double) percolation.numberOfOpenSites() / (n * n);
-            percolation = new Percolation(n);
+            }
+            int openSites = percolation.numberOfOpenSites();
+            double result = (double) openSites / (gridSize * gridSize);
+            results[trial] = result;
         }
-
-
     }
+
 
     // test client (see below)
     public static void main(String[] args) {
 
 
-        int n = StdIn.readInt();
-        int trials = StdIn.readInt();
+        int n = 20;
+        int trials = 10;
 
         if (args.length >= 2) {
             n = Integer.parseInt(args[0]);
@@ -49,9 +45,9 @@ public class PercolationStats {
 
         PercolationStats percolationStats = new PercolationStats(n, trials);
 
-        StdOut.printf("mean                    = %.16f\n", percolationStats.mean());
-        StdOut.printf("stddev                  = %.16f\n", percolationStats.stddev());
-        StdOut.printf("95%% confidence interval = [%.16f, %.16f]\n", percolationStats.confidenceLo(), percolationStats.confidenceHi());
+        StdOut.println("mean                    = " + percolationStats.mean());
+        StdOut.println("stddev                  = " + percolationStats.stddev());
+        StdOut.println("95% confidence interval = [" + percolationStats.confidenceLo() + ", " + percolationStats.confidenceHi()+"]");
 
     }
 

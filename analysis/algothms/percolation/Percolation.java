@@ -41,6 +41,7 @@ public class Percolation {
         col = 5;
         percolation.open(row, col);
         StdOut.println("Is full (5,5) " + percolation.isFull(5, 5));
+        StdOut.println("Percolate " + percolation.percolates());
 
 
     }
@@ -97,7 +98,8 @@ public class Percolation {
 
     private boolean connectedWithTopLayer(int row, int col) {
         for (int i = 0; i < sizeGrid; i++) {
-            if (weightedQuickUnionUF.connected(calcPosition(0, i), calcPosition(row, col))) {
+            if (!isOpen(1, i + 1)) continue;
+            if (weightedQuickUnionUF.find(calcPosition(0, i)) == weightedQuickUnionUF.find(calcPosition(row, col))) {
                 return true;
             }
         }
@@ -114,10 +116,10 @@ public class Percolation {
     public boolean percolates() {
         boolean pecolate = false;
         for (int i = 1; i <= sizeGrid; i++) {
+            if (!isOpen(sizeGrid, i)) continue;
             pecolate = isFull(sizeGrid, i);
             if (pecolate) break;
         }
-
         return pecolate;
     }
 }
