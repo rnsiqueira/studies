@@ -7,14 +7,18 @@ public class Percolation {
     private final boolean[] openedSites;
     private final int sizeGrid;
     private final WeightedQuickUnionUF weightedQuickUnionUF;
+    private final int referenceTop;
+    private final int referenceBottom;
     private int countOpenedSites = 0;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
         this.sizeGrid = n;
         if (n <= 0) throw new IllegalArgumentException("n must be greater than 0");
-        weightedQuickUnionUF = new WeightedQuickUnionUF(n * n);
+        weightedQuickUnionUF = new WeightedQuickUnionUF((n * n) + 2);
         openedSites = new boolean[n * n];
+        referenceTop = (n * n) + 1;
+        referenceBottom = (n * n);
 
     }
 
@@ -68,6 +72,13 @@ public class Percolation {
             weightedQuickUnionUF.union(calcPosition(row - 1, col - 1), calcPosition(row - 1, col));
         }
 
+        if (row == 1) {
+            weightedQuickUnionUF.union(referenceTop, calcPosition(row - 1, col - 1));
+        }
+        if (row == sizeGrid) {
+            weightedQuickUnionUF.union(referenceBottom, calcPosition(row - 1, col - 1));
+        }
+
     }
 
     private int calcPosition(int rowIndex, int colIndex) {
@@ -92,18 +103,8 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         validateGrid(row, col);
         if (!isOpen(row, col)) return false;
-        return connectedWithTopLayer(row - 1, col - 1);
+        return weightedQuickUnionUF.find(referenceTop) == weightedQuickUnionUF.find(calcPosition(row - 1, col - 1));
 
-    }
-
-    private boolean connectedWithTopLayer(int row, int col) {
-        for (int i = 0; i < sizeGrid; i++) {
-            if (!isOpen(1, i + 1)) continue;
-            if (weightedQuickUnionUF.find(calcPosition(0, i)) == weightedQuickUnionUF.find(calcPosition(row, col))) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -117,8 +118,8 @@ public class Percolation {
         boolean pecolate = false;
         for (int i = 1; i <= sizeGrid; i++) {
             if (!isOpen(sizeGrid, i)) continue;
-            pecolate = isFull(sizeGrid, i);
-            if (pecolate) break;
+            pecolate = weightedQuickUnionUF.find(referenceTop) == weightedQuickUnionUF.find(referenceBottom);
+            break;
         }
         return pecolate;
     }
